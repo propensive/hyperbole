@@ -27,11 +27,33 @@ object reflection:
         val c = expr.upto(_ != '\n')
         if c.length != expr.length then t"$c..." else expr
 
+
+    TypeRepr.of[runtime.impl.QuotesImpl].typeSymbol.declaredType("reflect$").head.declarations.flatMap: decl =>
+      decl.tree match
+        case ValDef(name, tpe, rhs) if !name.endsWith("TypeTest") && !name.endsWith("Methods") =>
+          decl.declaredMethod("unapply").headOption.to(List).map: sym =>
+            val returns = sym.info match
+              case MethodType(a, b, AppliedType(cls, tparams)) if cls.typeSymbol == defn.OptionClass => tparams
+              case MethodType(a, b, AppliedType(cls, tparams)) if cls.typeSymbol == defn.SomeModule.companionClass => tparams
+              case MethodType(a, b, AppliedType(cls, tparams)) if cls.typeSymbol == defn.TupleClass(2) => tparams
+              case MethodType(a, b, AppliedType(cls, tparams)) if cls.typeSymbol == defn.TupleClass(3) => tparams
+              case MethodType(a, b, AppliedType(cls, tparams)) if cls.typeSymbol == defn.TupleClass(4) => tparams
+              case MethodType(a, b, AppliedType(cls, tparams)) if cls.typeSymbol == defn.TupleClass(5) => tparams
+              case MethodType(a, b, ConstantType(BooleanConstant(_))) => Nil
+            
+            returns.foreach { ret => println(ret.typeSymbol.name+(if ret.typeArgs.isEmpty then "" else ret.typeArgs.map(_.typeArgs.map(_.typeSymbol.name)).mkString("[", ", ", "]"))) }
+            name -> sym
+
+        case _ => Nil
+    .foreach: (extr, sym) =>
+      println(extr)
    
     object TastyTree:
       def apply(name: Text, tree: Tree, children: List[TastyTree], parameter: Maybe[Text] = Unset): TastyTree =
         TastyTree(name, tree.show.show, source(tree).plain, children, parameter)
-    
+
+      
+
       def expand(tree: Tree): TastyTree = tree match
         case PackageClause(ref, chs)    => TastyTree(t"PackageClause", tree, expand(ref) :: chs.map(expand))
         case Bind(name, term)           => TastyTree(t"Bind", tree, List(expand(term)), name.show)
