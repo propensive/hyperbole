@@ -2,7 +2,8 @@ package hyperbole
 
 import escapade.*
 import rudiments.*
-import gossamer.*, textWidthCalculation.uniform
+import gossamer.*
+import lithography.*, textWidthCalculation.uniform
 import escritoire.*, tableStyles.horizontalGaps
 import dendrology.*
 
@@ -16,11 +17,11 @@ object reflection:
 
     def init = expr.asTerm.pos.startColumn
     
-    def source(tree: Tree): AnsiText = tree.pos match
+    def source(tree: Tree): Output = tree.pos match
       case pos: dtdu.SourcePosition =>
         ((t" "*(pos.startColumn - init))+pos.lineContent.show.slice(pos.startColumn, pos.endColumn)).ansi
       case _ =>
-        ansi""
+        out""
 
     case class TastyTree(name: Text, expr: Text, source: Text, children: List[TastyTree], param: Maybe[Text]):
       def shortCode: Text =
@@ -81,11 +82,11 @@ object reflection:
 
 
     Table[Expansion](
-      Column(ansi"TASTy")(_.text.ansi),
-      Column(ansi"Param")(_.param.or(t"")),
-      Column(ansi"Source")(_.source),
-      Column(ansi"Code")(_.expr)
-    ).tabulate(seq, 400, DelimitRows.None).join(ansi"${'\n'}").render
+      Column(out"TASTy")(_.text.ansi),
+      Column(out"Param")(_.param.or(t"")),
+      Column(out"Source")(_.source),
+      Column(out"Code")(_.expr)
+    ).tabulate(seq, 400, DelimitRows.None).join(out"${'\n'}").render
 
 
 case class Expansion(text: Text, param: Maybe[Text], expr: Text, source: Text)
