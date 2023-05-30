@@ -3,7 +3,7 @@ package hyperbole
 import escapade.*
 import rudiments.*
 import gossamer.*
-import lithography.*, textWidthCalculation.uniform
+import hieroglyph.*, textWidthCalculation.uniform
 import escritoire.*, tableStyles.horizontalGaps
 import dendrology.*
 
