@@ -11,7 +11,7 @@ import scala.quoted.*
 import dotty.tools.*, dotc.util as dtdu
 
 object reflection:
-  def expand[T](expr: Expr[T])(using Quotes): Text =
+  def introspect[T](expr: Expr[T])(using Quotes): Text =
     import quotes.reflect.*
     import treeStyles.default
 
